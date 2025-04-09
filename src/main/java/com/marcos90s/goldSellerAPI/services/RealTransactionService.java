@@ -1,5 +1,7 @@
 package com.marcos90s.goldSellerAPI.services;
 
+import com.marcos90s.goldSellerAPI.dto.RealTransactionRequestDTO;
+import com.marcos90s.goldSellerAPI.dto.RealTransactionResponseDTO;
 import com.marcos90s.goldSellerAPI.entities.RealTransaction;
 import com.marcos90s.goldSellerAPI.entities.Users;
 import com.marcos90s.goldSellerAPI.repository.RealTransactionRepository;
@@ -8,7 +10,9 @@ import com.marcos90s.goldSellerAPI.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RealTransactionService {
@@ -19,25 +23,54 @@ public class RealTransactionService {
     @Autowired
     UsersRepository usersRepository;
 
-    public RealTransaction create(RealTransaction obj){
-        Users user = obj.getUser();
-        user.applyRealTransaction(obj.getAmount());
+    public RealTransactionResponseDTO createTransaction(RealTransactionRequestDTO dto) {
+        Users user = usersRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        RealTransaction tx = new RealTransaction();
+        tx.setUser(user);
+        tx.setAmount(dto.getAmount());
+        tx.setCharName(dto.getCharName());
+        tx.setDescription(dto.getDescription());
+        tx.setDate(LocalDateTime.now());
+
+        user.applyRealTransaction(dto.getAmount());
+        user.getRealTransactions().add(tx);
         usersRepository.save(user);
-        obj.setDate(Utils.dateTimeFormatter());
-        System.out.println("Date: "+obj.getDate());
-        return realTransactionRepository.save(obj);
+        realTransactionRepository.save(tx);
+
+        return mapToResponseDTO(tx);
     }
 
-    public List<RealTransaction> getAll(){
-        return realTransactionRepository.findAll();
+    public List<RealTransactionResponseDTO> getAllTransactions() {
+        return realTransactionRepository.findAll()
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public RealTransaction getById(String id){
-        return realTransactionRepository.findById(id).orElseThrow(()-> new RuntimeException("Transaction not Found"));
+    public RealTransactionResponseDTO getTransactionById(String id) {
+        RealTransaction tx = realTransactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        return mapToResponseDTO(tx);
     }
 
-    public void deleteById(String id){
+    public void deleteTransaction(String id) {
+        if (!realTransactionRepository.existsById(id)) {
+            throw new RuntimeException("Transaction not found");
+        }
         realTransactionRepository.deleteById(id);
+    }
+
+    private RealTransactionResponseDTO mapToResponseDTO(RealTransaction tx) {
+        RealTransactionResponseDTO dto = new RealTransactionResponseDTO();
+        dto.setId(tx.getId());
+        dto.setUserId(tx.getUser().getId());
+        dto.setAmount(tx.getAmount());
+        dto.setCharName(tx.getCharName());
+        dto.setDate(tx.getDate());
+        dto.setDescription(tx.getDescription());
+        return dto;
     }
 
 }

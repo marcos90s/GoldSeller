@@ -1,5 +1,6 @@
 package com.marcos90s.goldSellerAPI.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.marcos90s.goldSellerAPI.enums.UserRole;
 import jakarta.persistence.*;
 
@@ -25,6 +26,7 @@ public class Users implements Serializable {
     private Integer totalGold;
     private Double totalMoney;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<RealTransaction> realTransactions = new ArrayList<>();
 
 
@@ -40,6 +42,10 @@ public class Users implements Serializable {
         this.totalGold = totalGold;
         this.totalMoney = totalMoney;
         this.realTransactions = realTransactions;
+    }
+
+    public List<RealTransaction> getRealTransactions() {
+        return realTransactions;
     }
 
     public String getId() {

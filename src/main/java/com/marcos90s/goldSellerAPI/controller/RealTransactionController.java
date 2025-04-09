@@ -1,15 +1,13 @@
 package com.marcos90s.goldSellerAPI.controller;
 
+import com.marcos90s.goldSellerAPI.dto.RealTransactionRequestDTO;
+import com.marcos90s.goldSellerAPI.dto.RealTransactionResponseDTO;
 import com.marcos90s.goldSellerAPI.entities.RealTransaction;
 import com.marcos90s.goldSellerAPI.services.RealTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -20,27 +18,24 @@ public class RealTransactionController {
     RealTransactionService realTransactionService;
 
     @PostMapping
-    public ResponseEntity<RealTransaction> create(@RequestBody RealTransaction obj){
-        obj = realTransactionService.create(obj);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
-        return ResponseEntity.created(uri).body(obj);
+    public ResponseEntity<RealTransactionResponseDTO> create(@RequestBody RealTransactionRequestDTO dto) {
+        RealTransactionResponseDTO response = realTransactionService.createTransaction(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<RealTransaction>> getAll(){
-        List<RealTransaction> realList = realTransactionService.getAll();
-        return ResponseEntity.ok().body(realList);
+    public ResponseEntity<List<RealTransactionResponseDTO>> getAll() {
+        return ResponseEntity.ok(realTransactionService.getAllTransactions());
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<RealTransaction> getById(@PathVariable String id){
-        RealTransaction obj = realTransactionService.getById(id);
-        return ResponseEntity.ok().body(obj);
+    @GetMapping("/{id}")
+    public ResponseEntity<RealTransactionResponseDTO> getById(@PathVariable String id) {
+        return ResponseEntity.ok(realTransactionService.getTransactionById(id));
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable String id){
-        realTransactionService.deleteById(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        realTransactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }
 }
