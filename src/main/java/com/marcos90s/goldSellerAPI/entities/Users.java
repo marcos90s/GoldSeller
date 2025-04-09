@@ -4,6 +4,8 @@ import com.marcos90s.goldSellerAPI.enums.UserRole;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -21,13 +23,15 @@ public class Users implements Serializable {
     @Enumerated(EnumType.STRING)
     private UserRole role;
     private Integer totalGold;
-    private Integer totalMoney;
+    private Double totalMoney;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RealTransaction> realTransactions = new ArrayList<>();
 
 
     public Users() {
     }
 
-    public Users(String id, String name, String email, String password, UserRole role, Integer totalGold, Integer totalMoney) {
+    public Users(String id, String name, String email, String password, UserRole role, Integer totalGold, Double totalMoney, List<RealTransaction> realTransactions) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -35,8 +39,8 @@ public class Users implements Serializable {
         this.role = role;
         this.totalGold = totalGold;
         this.totalMoney = totalMoney;
+        this.realTransactions = realTransactions;
     }
-
 
     public String getId() {
         return id;
@@ -62,7 +66,7 @@ public class Users implements Serializable {
         return totalGold;
     }
 
-    public Integer getTotalMoney() {
+    public Double getTotalMoney() {
         return totalMoney;
     }
 
@@ -90,8 +94,14 @@ public class Users implements Serializable {
         this.totalGold = totalGold;
     }
 
-    public void setTotalMoney(Integer totalMoney) {
+    public void setTotalMoney(Double totalMoney) {
         this.totalMoney = totalMoney;
+    }
+
+    public void applyRealTransaction(Double amount){
+        if (amount != null) {
+            this.totalMoney = (this.totalMoney != null ? this.totalMoney : 0.0) + amount;
+        }
     }
 
     @Override
