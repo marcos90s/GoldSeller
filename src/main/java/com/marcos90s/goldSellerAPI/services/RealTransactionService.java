@@ -29,11 +29,12 @@ public class RealTransactionService {
         RealTransaction tx = new RealTransaction();
         tx.setUser(user);
         tx.setAmount(dto.getAmount());
+        tx.setAmountInGold(dto.getAmountInGold());
         tx.setCharName(dto.getCharName());
         tx.setDescription(dto.getDescription());
         tx.setDate(LocalDateTime.now());
 
-        user.applyRealTransaction(dto.getAmount());
+        user.applyRealTransaction(dto.getAmount(), dto.getAmountInGold());
         user.getRealTransactions().add(tx);
         usersRepository.save(user);
         realTransactionRepository.save(tx);

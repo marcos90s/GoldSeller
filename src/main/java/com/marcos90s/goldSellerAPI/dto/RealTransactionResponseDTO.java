@@ -1,7 +1,6 @@
 package com.marcos90s.goldSellerAPI.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDateTime;
 
 public class RealTransactionResponseDTO {
@@ -9,6 +8,7 @@ public class RealTransactionResponseDTO {
     private String id;
     private String userId;
     private Double amount;
+    private Integer amountInGold;
     private String charName;
     @JsonFormat(shape =  JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime date;
@@ -60,5 +60,13 @@ public class RealTransactionResponseDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getAmountInGold() {
+        return amountInGold;
+    }
+
+    public void setAmountInGold(Integer amountInGold) {
+        this.amountInGold = amountInGold;
     }
 }

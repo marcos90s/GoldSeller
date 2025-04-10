@@ -102,9 +102,10 @@ public class Users implements Serializable {
         this.totalMoney = totalMoney;
     }
 
-    public void applyRealTransaction(Double amount){
+    public void applyRealTransaction(Double amount, Integer amountInGold){
         if (amount != null) {
             this.totalMoney = (this.totalMoney != null ? this.totalMoney : 0.0) + amount;
+            this.totalGold = (this.totalGold != null ? this.totalGold : 0) - amountInGold;
         }
     }
 

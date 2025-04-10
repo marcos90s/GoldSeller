@@ -4,6 +4,7 @@ public class RealTransactionRequestDTO {
 
     private String userId;
     private Double amount;
+    private  Integer amountInGold;
     private String charName;
     private String description;
 
@@ -37,5 +38,13 @@ public class RealTransactionRequestDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getAmountInGold() {
+        return amountInGold;
+    }
+
+    public void setAmountInGold(Integer amountInGold) {
+        this.amountInGold = amountInGold;
     }
 }

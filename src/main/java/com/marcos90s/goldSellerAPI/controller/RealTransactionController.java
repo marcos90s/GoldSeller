@@ -2,7 +2,6 @@ package com.marcos90s.goldSellerAPI.controller;
 
 import com.marcos90s.goldSellerAPI.dto.RealTransactionRequestDTO;
 import com.marcos90s.goldSellerAPI.dto.RealTransactionResponseDTO;
-import com.marcos90s.goldSellerAPI.entities.RealTransaction;
 import com.marcos90s.goldSellerAPI.services.RealTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

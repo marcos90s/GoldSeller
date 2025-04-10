@@ -10,8 +10,7 @@ public final class Utils {
 
     //Método para montar informações das RealTransaction atribuídas ao usuário
     public static List<String> makeRealTransactionInfo(List<RealTransaction> transactions){
-        return transactions.stream().map(tx -> String.format("Id: %s | Descrição: %s | Valor: %s | Data: %s | Para: %s" , tx.getId()
-        ,tx.getDescription(), tx.getAmount(), tx.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")), tx.getCharName())).collect(Collectors.toList());
+        return transactions.stream().map(tx -> String.format("Para: %s | Descrição: %s | Gold: %s | Valor: %s | Data: %s" , tx.getCharName()
+        ,tx.getDescription(), tx.getAmountInGold(), tx.getAmount(), tx.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))).collect(Collectors.toList());
     }
-
 }

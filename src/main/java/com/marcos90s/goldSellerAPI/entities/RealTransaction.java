@@ -1,8 +1,5 @@
 package com.marcos90s.goldSellerAPI.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -21,17 +18,20 @@ public class RealTransaction implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
     private Double amount;
+    private Integer amountInGold;
     private String charName;
     private LocalDateTime date;
     private String description;
 
 
-    public RealTransaction() {}
+    public RealTransaction() {
+    }
 
-    public RealTransaction(String id, Users user, Double amount, String charName, LocalDateTime date, String description) {
+    public RealTransaction(String id, Users user, Double amount, Integer amountInGold, String charName, LocalDateTime date, String description) {
         this.id = id;
         this.user = user;
         this.amount = amount;
+        this.amountInGold = amountInGold;
         this.charName = charName;
         this.date = date;
         this.description = description;
@@ -83,6 +83,14 @@ public class RealTransaction implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getAmountInGold() {
+        return amountInGold;
+    }
+
+    public void setAmountInGold(Integer amountInGold) {
+        this.amountInGold = amountInGold;
     }
 
     @Override
