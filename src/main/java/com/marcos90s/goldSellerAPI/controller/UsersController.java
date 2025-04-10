@@ -1,14 +1,13 @@
 package com.marcos90s.goldSellerAPI.controller;
 
-import com.marcos90s.goldSellerAPI.entities.Users;
+import com.marcos90s.goldSellerAPI.dto.UsersRequestDTO;
+import com.marcos90s.goldSellerAPI.dto.UsersResponseDTO;
 import com.marcos90s.goldSellerAPI.services.UsersService;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -19,34 +18,29 @@ public class UsersController {
     UsersService usersService;
 
     @PostMapping
-    public ResponseEntity<Users> createUser(@RequestBody Users obj){
-        obj = usersService.createUser(obj);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
-        return ResponseEntity.created(uri).body(obj);
+    public ResponseEntity<UsersResponseDTO> createUser(@RequestBody UsersRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usersService.createUser(dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<Users>> findAllUsers(){
-        List<Users> users = usersService.getAllUsers();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UsersResponseDTO>> getAllUsers() {
+        return ResponseEntity.ok(usersService.getAllUsers());
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Users> findUserById(@PathVariable String id){
-        Users obj = usersService.getUserById(id);
-        return ResponseEntity.ok().body(obj);
+    public ResponseEntity<UsersResponseDTO> getUserById(@PathVariable String id) {
+        return ResponseEntity.ok(usersService.getUserById(id));
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id){
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         usersService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Users> updateUser(@PathVariable String id, @RequestBody Users obj){
-        obj = usersService.updateUser(id, obj);
-        return ResponseEntity.ok(obj);
+    public ResponseEntity<UsersResponseDTO> updateUser(@PathVariable String id, @RequestBody UsersRequestDTO dto) {
+        return ResponseEntity.ok(usersService.updateUser(id, dto));
     }
 
 }
