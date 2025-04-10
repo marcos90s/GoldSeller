@@ -1,6 +1,5 @@
 package com.marcos90s.goldSellerAPI.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.marcos90s.goldSellerAPI.enums.UserRole;
 import jakarta.persistence.*;
 
@@ -25,8 +24,7 @@ public class Users implements Serializable {
     private UserRole role;
     private Integer totalGold;
     private Double totalMoney;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<RealTransaction> realTransactions = new ArrayList<>();
 
 

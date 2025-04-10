@@ -6,7 +6,6 @@ import com.marcos90s.goldSellerAPI.entities.RealTransaction;
 import com.marcos90s.goldSellerAPI.entities.Users;
 import com.marcos90s.goldSellerAPI.repository.RealTransactionRepository;
 import com.marcos90s.goldSellerAPI.repository.UsersRepository;
-import com.marcos90s.goldSellerAPI.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
