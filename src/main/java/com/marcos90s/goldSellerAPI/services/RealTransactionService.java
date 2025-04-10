@@ -4,6 +4,8 @@ import com.marcos90s.goldSellerAPI.dto.RealTransactionRequestDTO;
 import com.marcos90s.goldSellerAPI.dto.RealTransactionResponseDTO;
 import com.marcos90s.goldSellerAPI.entities.RealTransaction;
 import com.marcos90s.goldSellerAPI.entities.Users;
+import com.marcos90s.goldSellerAPI.exception.InternalServerErrorException;
+import com.marcos90s.goldSellerAPI.exception.NotFoundException;
 import com.marcos90s.goldSellerAPI.repository.RealTransactionRepository;
 import com.marcos90s.goldSellerAPI.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class RealTransactionService {
 
     public RealTransactionResponseDTO createTransaction(RealTransactionRequestDTO dto) {
         Users user = usersRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         RealTransaction tx = new RealTransaction();
         tx.setUser(user);
@@ -36,8 +38,16 @@ public class RealTransactionService {
 
         user.applyRealTransaction(dto.getAmount(), dto.getAmountInGold());
         user.getRealTransactions().add(tx);
-        usersRepository.save(user);
-        realTransactionRepository.save(tx);
+        try {
+            usersRepository.save(user);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error while saving user!");
+        }
+        try {
+            realTransactionRepository.save(tx);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error while saving transaction!");
+        }
 
         return mapToResponseDTO(tx);
     }
@@ -51,15 +61,19 @@ public class RealTransactionService {
 
     public RealTransactionResponseDTO getTransactionById(String id) {
         RealTransaction tx = realTransactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+                .orElseThrow(() -> new NotFoundException("Transaction not found!"));
         return mapToResponseDTO(tx);
     }
 
     public void deleteTransaction(String id) {
         if (!realTransactionRepository.existsById(id)) {
-            throw new RuntimeException("Transaction not found");
+            throw new NotFoundException("Transaction not found!");
         }
-        realTransactionRepository.deleteById(id);
+        try {
+            realTransactionRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error while deleting transaction");
+        }
     }
 
     private RealTransactionResponseDTO mapToResponseDTO(RealTransaction tx) {
