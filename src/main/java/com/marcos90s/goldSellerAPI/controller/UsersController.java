@@ -3,6 +3,7 @@ package com.marcos90s.goldSellerAPI.controller;
 import com.marcos90s.goldSellerAPI.dto.UsersRequestDTO;
 import com.marcos90s.goldSellerAPI.dto.UsersResponseDTO;
 import com.marcos90s.goldSellerAPI.services.UsersService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class UsersController {
     UsersService usersService;
 
     @PostMapping
-    public ResponseEntity<UsersResponseDTO> createUser(@RequestBody UsersRequestDTO dto) {
+    public ResponseEntity<UsersResponseDTO> createUser(@RequestBody @Valid UsersRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(usersService.createUser(dto));
     }
 

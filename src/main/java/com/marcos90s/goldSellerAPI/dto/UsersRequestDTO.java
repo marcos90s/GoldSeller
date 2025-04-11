@@ -1,11 +1,16 @@
 package com.marcos90s.goldSellerAPI.dto;
 
 import com.marcos90s.goldSellerAPI.enums.UserRole;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public class UsersRequestDTO {
-
+    @NotBlank(message = "Field Name is required")
     private String name;
+    @NotBlank(message = "Field Email is required")
+    @Email(message = "Invalid Email")
     private String email;
+    @NotBlank(message = "Field Password is required")
     private String password;
     private UserRole role;
 

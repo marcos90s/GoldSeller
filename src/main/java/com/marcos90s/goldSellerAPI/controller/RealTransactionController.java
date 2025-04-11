@@ -3,6 +3,7 @@ package com.marcos90s.goldSellerAPI.controller;
 import com.marcos90s.goldSellerAPI.dto.RealTransactionRequestDTO;
 import com.marcos90s.goldSellerAPI.dto.RealTransactionResponseDTO;
 import com.marcos90s.goldSellerAPI.services.RealTransactionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class RealTransactionController {
     RealTransactionService realTransactionService;
 
     @PostMapping
-    public ResponseEntity<RealTransactionResponseDTO> create(@RequestBody RealTransactionRequestDTO dto) {
+    public ResponseEntity<RealTransactionResponseDTO> create(@RequestBody @Valid RealTransactionRequestDTO dto) {
         RealTransactionResponseDTO response = realTransactionService.createTransaction(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

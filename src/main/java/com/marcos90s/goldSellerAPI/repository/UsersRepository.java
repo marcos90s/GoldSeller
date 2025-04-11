@@ -13,4 +13,7 @@ public interface UsersRepository extends JpaRepository<Users, String> {
     //Carregar lista de transações ao buscar um usuário pelo ID
     @Query("SELECT u FROM Users u LEFT JOIN FETCH u.realTransactions WHERE u.id = :id")
     Optional<Users> findByIdWithTransactions(@Param("id") String id);
+
+    boolean existsByEmail(String email);
+
 }

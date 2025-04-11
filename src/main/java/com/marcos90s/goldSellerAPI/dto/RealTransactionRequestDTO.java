@@ -1,10 +1,18 @@
 package com.marcos90s.goldSellerAPI.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class RealTransactionRequestDTO {
 
+    //Mudar para String email depois
+    @NotBlank(message = "Field UserId is required")
     private String userId;
+    @NotNull(message = "Field Amount is required!")
     private Double amount;
-    private  Integer amountInGold;
+    @NotNull(message = "Field Amount In Gold is required!")
+    private Integer amountInGold;
+    @NotBlank(message = "Field Char Name is required!")
     private String charName;
     private String description;
 
