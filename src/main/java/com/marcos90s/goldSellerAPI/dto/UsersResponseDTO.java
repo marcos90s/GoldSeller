@@ -12,6 +12,7 @@ public class UsersResponseDTO {
         private Integer totalGold;
         private Double totalMoney;
         private List<String> realTransactionIds = new ArrayList<>();
+        private List<String> gameTransactionIds = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -67,5 +68,13 @@ public class UsersResponseDTO {
 
     public void setRealTransactionIds(List<String> realTransactionIds) {
         this.realTransactionIds = realTransactionIds;
+    }
+
+    public List<String> getGameTransactionIds() {
+        return gameTransactionIds;
+    }
+
+    public void setGameTransactionIds(List<String> gameTransactionIds) {
+        this.gameTransactionIds = gameTransactionIds;
     }
 }

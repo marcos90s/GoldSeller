@@ -87,7 +87,7 @@ public class UsersService {
         dto.setTotalGold(user.getTotalGold());
         dto.setTotalMoney(user.getTotalMoney());
         dto.setRealTransactionIds(Utils.makeRealTransactionInfo(user.getRealTransactions()));
-
+        dto.setGameTransactionIds(Utils.makeGameTransactionInfo(user.getGameTransactions()));
         return dto;
     }
 }

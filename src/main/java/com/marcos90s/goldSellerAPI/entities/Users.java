@@ -26,12 +26,14 @@ public class Users implements Serializable {
     private Double totalMoney;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<RealTransaction> realTransactions = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<GameTransaction> gameTransactions = new ArrayList<>();
 
 
     public Users() {
     }
 
-    public Users(String id, String name, String email, String password, UserRole role, Integer totalGold, Double totalMoney, List<RealTransaction> realTransactions) {
+    public Users(String id, String name, String email, String password, UserRole role, Integer totalGold, Double totalMoney, List<RealTransaction> realTransactions, List<GameTransaction> gameTransactions) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -40,6 +42,11 @@ public class Users implements Serializable {
         this.totalGold = totalGold;
         this.totalMoney = totalMoney;
         this.realTransactions = realTransactions;
+        this.gameTransactions = gameTransactions;
+    }
+
+    public List<GameTransaction> getGameTransactions() {
+        return gameTransactions;
     }
 
     public List<RealTransaction> getRealTransactions() {
@@ -106,6 +113,14 @@ public class Users implements Serializable {
         if (amount != null) {
             this.totalMoney = (this.totalMoney != null ? this.totalMoney : 0.0) + amount;
             this.totalGold = (this.totalGold != null ? this.totalGold : 0) - amountInGold;
+        }
+    }
+
+    public void applyGameTransaction(Integer amount, Integer quantity, String type){
+        if(type.equals("SALE")){
+            this.totalGold = (this.totalGold != null ? this.totalGold : 0) +(amount * quantity);
+        }else {
+            this.totalGold = (this.totalGold != null ? this.totalGold : 0) -(amount * quantity);
         }
     }
 
