@@ -117,8 +117,9 @@ public class Users implements Serializable {
     }
 
     public void applyGameTransaction(Integer amount, Integer quantity, String type){
+        final double fee = 0.95;
         if(type.equals("SALE")){
-            this.totalGold = (this.totalGold != null ? this.totalGold : 0) +(amount * quantity);
+            this.totalGold = (this.totalGold != null ? this.totalGold : 0) +(int)(amount * quantity * fee);
         }else {
             this.totalGold = (this.totalGold != null ? this.totalGold : 0) -(amount * quantity);
         }
