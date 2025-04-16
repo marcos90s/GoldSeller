@@ -3,6 +3,7 @@ package com.marcos90s.goldSellerAPI.services;
 import com.marcos90s.goldSellerAPI.dto.UsersRequestDTO;
 import com.marcos90s.goldSellerAPI.dto.UsersResponseDTO;
 import com.marcos90s.goldSellerAPI.entities.Users;
+import com.marcos90s.goldSellerAPI.enums.UserRole;
 import com.marcos90s.goldSellerAPI.exception.BadRequestException;
 import com.marcos90s.goldSellerAPI.exception.InternalServerErrorException;
 import com.marcos90s.goldSellerAPI.exception.NotFoundException;
@@ -10,6 +11,7 @@ import com.marcos90s.goldSellerAPI.repository.UsersRepository;
 import com.marcos90s.goldSellerAPI.utils.Utils;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +22,9 @@ public class UsersService {
     @Autowired
     UsersRepository usersRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public UsersResponseDTO createUser(UsersRequestDTO dto) {
         if (usersRepository.existsByEmail(dto.getEmail())){
             throw new BadRequestException("Email is already exists!");
@@ -27,8 +32,8 @@ public class UsersService {
         Users user = new Users();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setRole(dto.getRole());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole(dto.getRole() != null ? dto.getRole() : UserRole.COMMON);
 
         try {
             usersRepository.save(user);
@@ -69,7 +74,7 @@ public class UsersService {
         }
         Users entity = usersRepository.getReferenceById(id);
         if (dto.getName() != null) entity.setName(dto.getName());
-        if (dto.getPassword() != null) entity.setPassword(dto.getPassword());
+        if (dto.getPassword() != null) entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         try {
             usersRepository.save(entity);
         } catch (Exception e) {
