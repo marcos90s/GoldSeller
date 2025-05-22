@@ -37,7 +37,14 @@ public class GameTransactionController {
         return ResponseEntity.ok(gameTransactionService.getTransactionById(id));
     }
 
+    @GetMapping("/user/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
+    public ResponseEntity<List<GameTransactionResponseDTO>> getByUserId(@PathVariable String id){
+        return ResponseEntity.ok(gameTransactionService.getByUserId(id));
+    }
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isUserFromGameTransact(#id, authentication.principal.username)")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         gameTransactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();

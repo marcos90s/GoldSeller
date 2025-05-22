@@ -36,8 +36,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         );
     }
 
-    public  Users getUserByEmail(String email){
-        return  usersRepository.findByEmail(email)
+    public Users getUserByEmail(String email){
+        return usersRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 }

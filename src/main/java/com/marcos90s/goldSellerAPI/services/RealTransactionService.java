@@ -8,7 +8,10 @@ import com.marcos90s.goldSellerAPI.exception.InternalServerErrorException;
 import com.marcos90s.goldSellerAPI.exception.NotFoundException;
 import com.marcos90s.goldSellerAPI.repository.RealTransactionRepository;
 import com.marcos90s.goldSellerAPI.repository.UsersRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +28,10 @@ public class RealTransactionService {
     UsersRepository usersRepository;
 
     public RealTransactionResponseDTO createTransaction(RealTransactionRequestDTO dto) {
-        Users user = usersRepository.findById(dto.getUserId())
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         RealTransaction tx = new RealTransaction();
@@ -65,15 +71,24 @@ public class RealTransactionService {
         return mapToResponseDTO(tx);
     }
 
+    public List<RealTransactionResponseDTO> getByUserId(String id){
+        if(!usersRepository.existsById(id)){
+            throw new NotFoundException("Not Found!");
+        }
+        return realTransactionRepository.findByUserId(id)
+                .stream().map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
     public void deleteTransaction(String id) {
-        if (!realTransactionRepository.existsById(id)) {
-            throw new NotFoundException("Transaction not found!");
-        }
-        try {
-            realTransactionRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new InternalServerErrorException("Error while deleting transaction");
-        }
+        RealTransaction realTransaction = realTransactionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Transaction not found!"));
+
+        Users user = realTransaction.getUser();
+        user.getRealTransactions().remove(realTransaction);
+
+        usersRepository.save(user);
     }
 
     private RealTransactionResponseDTO mapToResponseDTO(RealTransaction tx) {
@@ -81,6 +96,7 @@ public class RealTransactionService {
         dto.setId(tx.getId());
         dto.setUserId(tx.getUser().getId());
         dto.setAmount(tx.getAmount());
+        dto.setAmountInGold(tx.getAmountInGold());
         dto.setCharName(tx.getCharName());
         dto.setDate(tx.getDate());
         dto.setDescription(tx.getDescription());

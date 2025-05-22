@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public class RealTransactionRequestDTO {
 
-    //Mudar para String email depois
-    @NotBlank(message = "Field UserId is required")
-    private String userId;
     @NotNull(message = "Field Amount is required!")
     private Double amount;
     @NotNull(message = "Field Amount In Gold is required!")
@@ -15,14 +12,6 @@ public class RealTransactionRequestDTO {
     @NotBlank(message = "Field Char Name is required!")
     private String charName;
     private String description;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public Double getAmount() {
         return amount;

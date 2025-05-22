@@ -5,9 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class GameTransactionRequestDTO {
-    //Mudar para String email
-    @NotBlank(message = "Field UserId is required")
-    private String userId;
+
     private GameTransactionType type;
     @NotNull(message = "Field Amount is required!")
     private Integer amount;
@@ -15,14 +13,6 @@ public class GameTransactionRequestDTO {
     private Integer quantity;
     @NotBlank(message = "Field ItemName is required!")
     private String itemName;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public GameTransactionType getType() {
         return type;

@@ -8,7 +8,10 @@ import com.marcos90s.goldSellerAPI.exception.InternalServerErrorException;
 import com.marcos90s.goldSellerAPI.exception.NotFoundException;
 import com.marcos90s.goldSellerAPI.repository.GameTransactionRepository;
 import com.marcos90s.goldSellerAPI.repository.UsersRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +28,10 @@ public class GameTransactionService {
     UsersRepository usersRepository;
 
     public GameTransactionResponseDTO createTransaction(GameTransactionRequestDTO dto) {
-        Users user = usersRepository.findById(dto.getUserId())
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         GameTransaction tx = new GameTransaction();
@@ -60,21 +66,31 @@ public class GameTransactionService {
                 .collect(Collectors.toList());
     }
 
+    public List<GameTransactionResponseDTO> getByUserId(String id){
+        if(!usersRepository.existsById(id)){
+            throw new NotFoundException("Not Found!");
+        }
+        return gameTransactionRepository.findByUserId(id).stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     public GameTransactionResponseDTO getTransactionById(String id) {
         GameTransaction tx = gameTransactionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Transaction not found!"));
         return mapToResponseDTO(tx);
     }
 
+    @Transactional
     public void deleteTransaction(String id) {
-        if (!gameTransactionRepository.existsById(id)) {
-            throw new NotFoundException("Transaction not found!");
-        }
-        try {
-            gameTransactionRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new InternalServerErrorException("Error while deleting transaction");
-        }
+        GameTransaction gameTransaction = gameTransactionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Transaction not found!"));
+
+        Users user = gameTransaction.getUser();
+        user.getGameTransactions().remove(gameTransaction);
+
+        usersRepository.save(user);
+
     }
 
     private GameTransactionResponseDTO mapToResponseDTO(GameTransaction tx) {

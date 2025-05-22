@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.method.MethodAuthorizationDeniedHandler;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -37,12 +41,14 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users/{id}", "/game/user/**", "/real/user/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/game/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/real/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/users/**").authenticated().anyRequest().authenticated()
-                ).sessionManagement(session -> session
+                        .requestMatchers(HttpMethod.DELETE, "/real/{id}", "game/{id}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/game/{id}", "/game", "/real/{id}", "/real").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/**").authenticated()
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 ).authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthFilter,
                         UsernamePasswordAuthenticationFilter.class);

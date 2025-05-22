@@ -32,10 +32,12 @@ public class AuthService {
     private UsersService usersService;
 
     public AuthResponseDTO authenticate(AuthRequestDTO request){
+        System.out.println("Authenticate method --- request: "+request.toString());
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
         ));
+        System.out.println("Authentication object: "+ authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());

@@ -3,10 +3,13 @@ package com.marcos90s.goldSellerAPI.exception;
 import com.marcos90s.goldSellerAPI.dto.ExceptionDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -35,7 +38,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionDTO> handleOtherExceptions(Exception e) {
-        ExceptionDTO exceptionDTO = ExceptionDTO.create(500 , "Unexpected error: " + e.getMessage());
+        ExceptionDTO exceptionDTO = ExceptionDTO.create(500 , "Unexpected error: " + e.getMessage()+"\n "+e.getClass()+ "\n"+e.getStackTrace().toString());
         return ResponseEntity.status(500).body(exceptionDTO);
     }
 
@@ -48,5 +51,24 @@ public class GlobalExceptionHandler {
 
         ExceptionDTO exceptionDTO = ExceptionDTO.create(HttpStatus.BAD_REQUEST.value(), errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionDTO);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ExceptionDTO> handleBadCredentials(BadCredentialsException ex){
+        ExceptionDTO exceptionDTO = ExceptionDTO.create(401, ex.getMessage());
+        return ResponseEntity.status(401).body(exceptionDTO);
+
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionDTO> handleAccessDeniedException(AccessDeniedException ex){
+        ExceptionDTO exceptionDTO = ExceptionDTO.create(401, ex.getMessage());
+        return ResponseEntity.status(401).body(exceptionDTO);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ExceptionDTO> handleAuthDeniedException(AuthorizationDeniedException ex){
+        ExceptionDTO exceptionDTO = ExceptionDTO.create(403, ex.getMessage());
+        return ResponseEntity.status(403).body(exceptionDTO);
     }
 }
