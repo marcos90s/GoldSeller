@@ -149,3 +149,7 @@ Este projeto fornece uma API para gerenciar usuários e transações de ouro em 
 ## Segurança
 
 As APIs são protegidas com autenticação JWT. Para acessar os endpoints protegidos, você precisa fornecer um token JWT válido no header `Authorization` da requisição.
+
+## Licença
+
+Este projeto está licenciado sob a [MIT License](LICENSE).
