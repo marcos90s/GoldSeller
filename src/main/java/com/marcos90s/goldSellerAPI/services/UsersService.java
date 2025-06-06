@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +51,21 @@ public class UsersService {
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
     }
+
+    public List<UsersResponseDTO> getByEmail(String email){
+        List<UsersResponseDTO> listUserDto = new ArrayList<>();
+        List<Users> users = usersRepository.findUsersByEmailContaining(email);
+
+        if(users.isEmpty()){
+            System.out.println("User not Found. Throwing exception...");
+            throw new NotFoundException("Users with email: "+email + " not Found");
+        }
+        for (Users user : users){
+           listUserDto.add(mapToResponseDTO(user));
+        }
+        return listUserDto;
+    }
+
     @Transactional
     public UsersResponseDTO getUserById(String id) {
         Users user = usersRepository.findByIdWithTransactions(id)

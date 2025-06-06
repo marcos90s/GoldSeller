@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,11 +25,26 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usersService.createUser(dto));
     }
 
+    @GetMapping("/teste")
+    public ResponseEntity<List<UsersResponseDTO>> getAllUsersTesteFront(){
+        return ResponseEntity.ok(usersService.getAllUsers());
+    }
+
     //Only ADMIN
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UsersResponseDTO>> getAllUsers() {
-        return ResponseEntity.ok(usersService.getAllUsers());
+    public ResponseEntity<List<UsersResponseDTO>> getAllUsers(@RequestParam (name = "email", required = false) String email) {
+        List<UsersResponseDTO> users;
+        System.out.println("PARAMETRO RECEBIDO BACKEND: "+email
+        );
+        if(email != null && !email.trim().isEmpty()){
+            System.out.println("GET BY EMAIL");
+            users = usersService.getByEmail(email);
+        }else {
+            System.out.println("GET ALL");
+            users = usersService.getAllUsers();
+        }
+        return ResponseEntity.ok(users);
     }
     //ADMIN and id that matches with current user id
     @GetMapping(value = "/{id}")
@@ -36,6 +52,13 @@ public class UsersController {
     public ResponseEntity<UsersResponseDTO> getUserById(@PathVariable String id) {
         return ResponseEntity.ok(usersService.getUserById(id));
     }
+
+    @GetMapping(value = "search")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UsersResponseDTO>> getByEmail(@RequestParam("email") String email){
+        return ResponseEntity.ok(usersService.getByEmail(email));
+    }
+
     //Only ADMIN
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasRole('ADMIN')")
