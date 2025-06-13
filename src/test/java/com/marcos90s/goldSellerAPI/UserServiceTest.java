@@ -16,7 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,33 +54,17 @@ public class UserServiceTest {
         validUser1 = new Users(null, "Joãozinho",
                 "joãozinho@email.com", "senhaCodificada123",
                 UserRole.COMMON, null, null, new ArrayList<>(), new ArrayList<>());
-        validUser2 = new Users(null, "Joãozin",
-                "joãozin@email.com", "senhaCodificada123",
-                UserRole.COMMON, null, null, new ArrayList<>(), new ArrayList<>());
-
-        validUserRequestDTO = new UsersRequestDTO();
-        validUserResponseDTO1 = new UsersResponseDTO();
-        validUserResponseDTO2 = new UsersResponseDTO();
-
-        validUserRequestDTO = createUserRequestDTO(validUser1.getName(),
-                validUser1.getEmail(),
-                "senha123",
-                validUser1.getRole());
-
-        validUserResponseDTO1 = createUserResponseDTO(validUser1.getId(),
-                validUser1.getName(),
-                validUser1.getEmail(),
-                "COMMON");
-
-        validUserResponseDTO2 = createUserResponseDTO(validUser2.getId(),
-                validUser2.getName(), validUser2.getEmail(), "COMMON");
-
 
     }
 
     @Test
     @DisplayName("Deve cadastrar um usuário com sucesso")
     void shouldInsertUserAndReturnDto(){
+        validUserRequestDTO = new UsersRequestDTO();
+        validUserRequestDTO = createUserRequestDTO(validUser1.getName(),
+                validUser1.getEmail(),
+                "senha123",
+                validUser1.getRole());
 
         when(passwordEncoder.encode(validUserRequestDTO.getPassword())).thenReturn("senhaCodificada123");
         //Quando a procura por email é chamada, retornamos false (cenário de sucesso).
@@ -107,6 +90,11 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve lançar exceção quando email for existente")
     void shouldThrowExceptionForExistingEmail(){
+        validUserRequestDTO = new UsersRequestDTO();
+        validUserRequestDTO = createUserRequestDTO(validUser1.getName(),
+                validUser1.getEmail(),
+                "senha123",
+                validUser1.getRole());
         //Chamar existsByEmail e retornar true;
         when(usersRepository.existsByEmail(validUserRequestDTO.getEmail())).thenReturn(true);
 
@@ -120,6 +108,22 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve Retornar todos usuários como DTO")
     void shouldReturnAllUsersDto(){
+        validUser2 = new Users(null, "Joãozin",
+                "joãozin@email.com", "senhaCodificada123",
+                UserRole.COMMON, null, null, new ArrayList<>(), new ArrayList<>());
+
+        validUserResponseDTO1 = new UsersResponseDTO();
+        validUserResponseDTO1 = createUserResponseDTO(validUser1.getId(),
+                validUser1.getName(),
+                validUser1.getEmail(),
+                "COMMON");
+
+        validUserResponseDTO2 = new UsersResponseDTO();
+        validUserResponseDTO2 = createUserResponseDTO(validUser2.getId(),
+                validUser2.getName(),
+                validUser2.getEmail(),
+                "COMMON");
+
 
         when(usersRepository.findAll()).thenReturn(Arrays.asList(validUser1, validUser2));
 
@@ -137,6 +141,19 @@ public class UserServiceTest {
     @Test
     @DisplayName("Deve Retornar lista de users contendo string no email")
     void shouldSearchByEmailAndReturnDto(){
+        validUser2 = new Users(null, "Joãozin",
+                "joãozin@email.com", "senhaCodificada123",
+                UserRole.COMMON, null, null, new ArrayList<>(), new ArrayList<>());
+
+        validUserResponseDTO1 = new UsersResponseDTO();
+        validUserResponseDTO1 = createUserResponseDTO(validUser1.getId(),
+                validUser1.getName(),
+                validUser1.getEmail(),
+                "COMMON");
+
+        validUserResponseDTO2 = new UsersResponseDTO();
+        validUserResponseDTO2 = createUserResponseDTO(validUser2.getId(),
+                validUser2.getName(), validUser2.getEmail(), "COMMON");
 
         String emailToFind = "joãoz";
         when(usersRepository.findUsersByEmailContaining(emailToFind)).thenReturn(Arrays.asList(validUser1, validUser2));
