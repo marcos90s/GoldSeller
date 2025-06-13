@@ -5,6 +5,7 @@ import com.marcos90s.goldSellerAPI.dto.UsersResponseDTO;
 import com.marcos90s.goldSellerAPI.entities.Users;
 import com.marcos90s.goldSellerAPI.enums.UserRole;
 import com.marcos90s.goldSellerAPI.exception.BadRequestException;
+import com.marcos90s.goldSellerAPI.exception.NotFoundException;
 import com.marcos90s.goldSellerAPI.repository.UsersRepository;
 import com.marcos90s.goldSellerAPI.services.UsersService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -130,6 +132,56 @@ public class UserServiceTest {
 
     }
 
+    @Test
+    @DisplayName("Deve Retornar lista de users contendo string no email")
+    void deveBuscarPorEmailComSucesso(){
+
+        String emailToFind = "joãoz";
+        when(usersRepository.findUsersByEmailContaining(emailToFind)).thenReturn(Arrays.asList(validUser1, validUser2));
+
+        List<UsersResponseDTO> foundedUsers = usersService.getByEmail(emailToFind);
+        assertNotNull(foundedUsers, "A lista não deve ser nula");
+        assertEquals(2, foundedUsers.size());
+        assertUserResponseDTOEquals(validUserResponseDTO1, foundedUsers.get(0));
+        assertUserResponseDTOEquals(validUserResponseDTO2, foundedUsers.get(1));
+
+        verify(usersRepository, times(1)).findUsersByEmailContaining(emailToFind);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando a lista for vazia")
+    void deveLancarExcecaoQuandoListaForVazia(){
+        String emailToFind = "joãoz";
+        when(usersRepository.findUsersByEmailContaining(emailToFind)).thenReturn(Collections.emptyList());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                usersService.getByEmail(emailToFind));
+        assertEquals("Users with email: "+emailToFind + " not Found", exception.getMessage());
+        verify(usersRepository, times(1)).findUsersByEmailContaining(emailToFind);
+    }
+
+    @Test
+    @DisplayName("Deve deletar usuário com sucesso")
+    void deveDeletarUserComSucesso(){
+        when(usersRepository.existsById(validUser1.getId())).thenReturn(true);
+        doNothing().when(usersRepository).deleteById(validUser1.getId());
+
+        assertDoesNotThrow(() -> usersService.deleteById(validUser1.getId()));
+        verify(usersRepository, times(1)).existsById(validUser1.getId());
+        verify(usersRepository, times(1)).deleteById(validUser1.getId());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando email não existir")
+    void deveLancarExcecaoSeEmailNaoExiste(){
+        when(usersRepository.existsById(validUser1.getId())).thenReturn(false);
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                usersService.deleteById(validUser1.getId()));
+
+        assertEquals("User not Found!", exception.getMessage());
+        verify(usersRepository, times(1)).existsById(validUser1.getId());
+    }
     private UsersResponseDTO createUserResponseDTO(String id, String name, String email, String role) {
         UsersResponseDTO dto = new UsersResponseDTO();
         dto.setId(id);
