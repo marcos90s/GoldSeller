@@ -79,7 +79,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Deve cadastrar um usuário com sucesso")
-    void deveCadastrarUsuarioERetornarDTOComSucesso(){
+    void shouldInsertUserAndReturnDto(){
 
         when(passwordEncoder.encode(validUserRequestDTO.getPassword())).thenReturn("senhaCodificada123");
         //Quando a procura por email é chamada, retornamos false (cenário de sucesso).
@@ -104,7 +104,7 @@ public class UserServiceTest {
     }
     @Test
     @DisplayName("Deve lançar exceção quando email for existente")
-    void deveLancarExcecaoParaEmailExistente(){
+    void shouldThrowExceptionForExistingEmail(){
         //Chamar existsByEmail e retornar true;
         when(usersRepository.existsByEmail(validUserRequestDTO.getEmail())).thenReturn(true);
 
@@ -117,7 +117,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Deve Retornar todos usuários como DTO")
-    void deveRetornarTodosUsersComoDTO(){
+    void shouldReturnAllUsersDto(){
 
         when(usersRepository.findAll()).thenReturn(Arrays.asList(validUser1, validUser2));
 
@@ -134,7 +134,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Deve Retornar lista de users contendo string no email")
-    void deveBuscarPorEmailComSucesso(){
+    void shouldSearchByEmailAndReturnDto(){
 
         String emailToFind = "joãoz";
         when(usersRepository.findUsersByEmailContaining(emailToFind)).thenReturn(Arrays.asList(validUser1, validUser2));
@@ -150,7 +150,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Deve lançar exceção quando a lista for vazia")
-    void deveLancarExcecaoQuandoListaForVazia(){
+    void shouldThrowExceptionWhenEmptyList(){
         String emailToFind = "joãoz";
         when(usersRepository.findUsersByEmailContaining(emailToFind)).thenReturn(Collections.emptyList());
 
@@ -162,7 +162,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Deve deletar usuário com sucesso")
-    void deveDeletarUserComSucesso(){
+    void shouldDeleteById(){
         when(usersRepository.existsById(validUser1.getId())).thenReturn(true);
         doNothing().when(usersRepository).deleteById(validUser1.getId());
 
@@ -172,8 +172,8 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando email não existir")
-    void deveLancarExcecaoSeEmailNaoExiste(){
+    @DisplayName("Deve lançar exceção quando id não existir")
+    void shouldThrowExceptionIfIdNotExists(){
         when(usersRepository.existsById(validUser1.getId())).thenReturn(false);
 
         NotFoundException exception = assertThrows(NotFoundException.class, () ->
