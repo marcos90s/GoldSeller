@@ -12,9 +12,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -182,6 +184,85 @@ public class UserServiceTest {
         assertEquals("User not Found!", exception.getMessage());
         verify(usersRepository, times(1)).existsById(validUser1.getId());
     }
+
+    @Test
+    @DisplayName("Deve alterar usuário com sucesso")
+    void shouldAlterUserWithSuccessAndReturnDto(){
+        when(usersRepository.existsById(validUser1.getId())).thenReturn(true);
+        when(usersRepository.getReferenceById(validUser1.getId())).thenReturn(validUser1);
+
+        UsersRequestDTO requestDTO = new UsersRequestDTO();
+        requestDTO.setName("joão atualizado");
+        requestDTO.setPassword("novaSenhaDoJoãozinho");
+
+        String encryptedPasswordMock = "senha_codificada_super_dificil";
+        when(passwordEncoder.encode("novaSenhaDoJoãozinho")).thenReturn(encryptedPasswordMock);
+
+        when(usersRepository.save(any(Users.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UsersResponseDTO responseDTO = usersService.updateUser(validUser1.getId(), requestDTO);
+
+        ArgumentCaptor<Users> userCaptor = ArgumentCaptor.forClass(Users.class);
+
+        verify(usersRepository, times(1)).save(userCaptor.capture());
+        Users savedUser = userCaptor.getValue();
+
+        assertEquals("joão atualizado", savedUser.getName());
+        assertEquals(encryptedPasswordMock, savedUser.getPassword());
+        assertNotNull(responseDTO);
+        verify(passwordEncoder, times(1)).encode(requestDTO.getPassword());
+
+    }
+
+    @Test
+    @DisplayName("Deve alterar apenas o nome do usuário quando a senha for nula")
+    void shouldAlterOnlyUserNameWhenPasswordIsNull(){
+        when(usersRepository.existsById(validUser1.getId())).thenReturn(true);
+        when(usersRepository.getReferenceById(validUser1.getId())).thenReturn(validUser1);
+
+        UsersRequestDTO requestDTO = new UsersRequestDTO();
+        requestDTO.setName("joão atualizado");
+
+        when(usersRepository.save(any(Users.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        UsersResponseDTO responseDTO = usersService.updateUser(validUser1.getId(), requestDTO);
+
+        ArgumentCaptor<Users> userCaptor = ArgumentCaptor.forClass(Users.class);
+
+        verify(usersRepository, times(1)).save(userCaptor.capture());
+        Users savedUser = userCaptor.getValue();
+
+        assertEquals("joão atualizado", savedUser.getName());
+        assertEquals(validUser1.getPassword(), savedUser.getPassword());
+        verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("Deve alterar apenas a senha quando o nome for nulo")
+    void shouldAlterOnlyPasswordWhenNameIsNull(){
+        when(usersRepository.existsById(validUser1.getId())).thenReturn(true);
+        when(usersRepository.getReferenceById(validUser1.getId())).thenReturn(validUser1);
+
+        UsersRequestDTO requestDTO = new UsersRequestDTO();
+        requestDTO.setPassword("novaSenhaDoJoãozinho");
+
+        String encryptedPasswordMock = "senha_codificada_super_dificil";
+        when(passwordEncoder.encode("novaSenhaDoJoãozinho")).thenReturn(encryptedPasswordMock);
+
+        when(usersRepository.save(any(Users.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UsersResponseDTO responseDTO = usersService.updateUser(validUser1.getId(), requestDTO);
+
+        ArgumentCaptor<Users> userCaptor = ArgumentCaptor.forClass(Users.class);
+
+        verify(usersRepository, times(1)).save(userCaptor.capture());
+        Users savedUser = userCaptor.getValue();
+        assertEquals(validUser1.getName(), savedUser.getName());
+        assertEquals(encryptedPasswordMock, savedUser.getPassword());
+        verify(passwordEncoder, times(1)).encode(requestDTO.getPassword());
+
+
+    }
+
     private UsersResponseDTO createUserResponseDTO(String id, String name, String email, String role) {
         UsersResponseDTO dto = new UsersResponseDTO();
         dto.setId(id);
