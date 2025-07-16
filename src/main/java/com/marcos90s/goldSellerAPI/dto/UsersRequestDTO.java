@@ -8,7 +8,8 @@ public class UsersRequestDTO {
     @NotBlank(message = "Field Name is required")
     private String name;
     @NotBlank(message = "Field Email is required")
-    @Email(message = "Invalid Email")
+    @Email(message = "Invalid email format")
+
     private String email;
     @NotBlank(message = "Field Password is required")
     private String password;
