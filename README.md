@@ -33,7 +33,7 @@ Este projeto fornece uma API para gerenciar usuários e transações de ouro em 
 1.  **Clone o repositório:**
 
     ```bash
-    git clone <URL_DO_REPOSITORIO>
+    git clone git@github.com:marcos90s/GoldSeller.git
     ```
 
 2.  **Configure o banco de dados:**
