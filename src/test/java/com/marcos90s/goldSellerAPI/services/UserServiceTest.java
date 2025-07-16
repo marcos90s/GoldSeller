@@ -1,4 +1,4 @@
-package com.marcos90s.goldSellerAPI;
+package com.marcos90s.goldSellerAPI.services;
 
 import com.marcos90s.goldSellerAPI.dto.UsersRequestDTO;
 import com.marcos90s.goldSellerAPI.dto.UsersResponseDTO;
@@ -7,7 +7,6 @@ import com.marcos90s.goldSellerAPI.enums.UserRole;
 import com.marcos90s.goldSellerAPI.exception.BadRequestException;
 import com.marcos90s.goldSellerAPI.exception.NotFoundException;
 import com.marcos90s.goldSellerAPI.repository.UsersRepository;
-import com.marcos90s.goldSellerAPI.services.UsersService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,12 +28,10 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class) //Integração Mockito com JUnit 5
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    private String randomUUID;
-
-    @Mock //Mock da interface UsersRepository
+    @Mock
     private UsersRepository usersRepository;
 
     @Mock
@@ -59,19 +56,13 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Deve cadastrar um usuário com sucesso")
-    void shouldInsertUserAndReturnDto(){
+    void shouldCreateUserAndReturnDto(){
         validUserRequestDTO = new UsersRequestDTO();
-        validUserRequestDTO = createUserRequestDTO(validUser1.getName(),
-                validUser1.getEmail(),
-                "senha123",
-                validUser1.getRole());
+        validUserRequestDTO = createUserRequestDTO(validUser1);
 
         when(passwordEncoder.encode(validUserRequestDTO.getPassword())).thenReturn("senhaCodificada123");
-        //Quando a procura por email é chamada, retornamos false (cenário de sucesso).
         when(usersRepository.existsByEmail(validUserRequestDTO.getEmail())).thenReturn(false);
-        //Quando salvamos qualquer Usuário do tipo User, retornamos um usuário válido (cenário de sucesso).
         when(usersRepository.save(any(Users.class))).thenReturn(validUser1);
-        //Chamada do método de criação
         UsersResponseDTO responseDTO = usersService.createUser(validUserRequestDTO);
 
         assertNotNull(responseDTO);
@@ -91,11 +82,8 @@ public class UserServiceTest {
     @DisplayName("Deve lançar exceção quando email for existente")
     void shouldThrowExceptionForExistingEmail(){
         validUserRequestDTO = new UsersRequestDTO();
-        validUserRequestDTO = createUserRequestDTO(validUser1.getName(),
-                validUser1.getEmail(),
-                "senha123",
-                validUser1.getRole());
-        //Chamar existsByEmail e retornar true;
+        validUserRequestDTO = createUserRequestDTO(validUser1);
+
         when(usersRepository.existsByEmail(validUserRequestDTO.getEmail())).thenReturn(true);
 
         BadRequestException exception = assertThrows(BadRequestException.class, () ->{
@@ -113,16 +101,10 @@ public class UserServiceTest {
                 UserRole.COMMON, null, null, new ArrayList<>(), new ArrayList<>());
 
         validUserResponseDTO1 = new UsersResponseDTO();
-        validUserResponseDTO1 = createUserResponseDTO(validUser1.getId(),
-                validUser1.getName(),
-                validUser1.getEmail(),
-                "COMMON");
+        validUserResponseDTO1 = createUserResponseDTO(validUser1);
 
         validUserResponseDTO2 = new UsersResponseDTO();
-        validUserResponseDTO2 = createUserResponseDTO(validUser2.getId(),
-                validUser2.getName(),
-                validUser2.getEmail(),
-                "COMMON");
+        validUserResponseDTO2 = createUserResponseDTO(validUser2);
 
 
         when(usersRepository.findAll()).thenReturn(Arrays.asList(validUser1, validUser2));
@@ -146,14 +128,10 @@ public class UserServiceTest {
                 UserRole.COMMON, null, null, new ArrayList<>(), new ArrayList<>());
 
         validUserResponseDTO1 = new UsersResponseDTO();
-        validUserResponseDTO1 = createUserResponseDTO(validUser1.getId(),
-                validUser1.getName(),
-                validUser1.getEmail(),
-                "COMMON");
+        validUserResponseDTO1 = createUserResponseDTO(validUser1);
 
         validUserResponseDTO2 = new UsersResponseDTO();
-        validUserResponseDTO2 = createUserResponseDTO(validUser2.getId(),
-                validUser2.getName(), validUser2.getEmail(), "COMMON");
+        validUserResponseDTO2 = createUserResponseDTO(validUser2);
 
         String emailToFind = "joãoz";
         when(usersRepository.findUsersByEmailContaining(emailToFind)).thenReturn(Arrays.asList(validUser1, validUser2));
@@ -280,12 +258,12 @@ public class UserServiceTest {
 
     }
 
-    private UsersResponseDTO createUserResponseDTO(String id, String name, String email, String role) {
+    private UsersResponseDTO createUserResponseDTO(Users user) {
         UsersResponseDTO dto = new UsersResponseDTO();
-        dto.setId(id);
-        dto.setName(name);
-        dto.setEmail(email);
-        dto.setRole(role);
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole().toString());
         dto.setTotalGold(null);
         dto.setTotalMoney(null);
         dto.setRealTransactionIds(new ArrayList<>());
@@ -293,12 +271,12 @@ public class UserServiceTest {
         return dto;
     }
 
-    private UsersRequestDTO createUserRequestDTO(String name, String email, String password, UserRole role){
+    private UsersRequestDTO createUserRequestDTO(Users user){
         UsersRequestDTO dto = new UsersRequestDTO();
-        dto.setName(name);
-        dto.setEmail(email);
-        dto.setPassword(password);
-        dto.setRole(role);
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPassword(user.getPassword());
+        dto.setRole(user.getRole());
         return dto;
     }
 
