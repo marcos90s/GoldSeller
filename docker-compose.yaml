@@ -3,20 +3,20 @@ version: '3.8'
 services:
 
   db:
-    image: postgres:14.1-alpine  # Usamos uma imagem oficial do PostgreSQL.
+    image: postgres:17-alpine
     container_name: postgres-db
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=gold_seller_db
+      - POSTGRES_USER=marquin
+      - POSTGRES_PASSWORD=post1929
+      - POSTGRES_DB=gold_seller
     ports:
-      - "5432:5432"
+      - "5499:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - minha-rede # Conecta este serviço a uma rede customizada.
+      - minha-rede
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d gold_seller_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U marquin -d gold_seller" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,9 +32,9 @@ services:
         condition: service_healthy
     environment:
       # Configurações para a aplicação Spring se conectar ao banco 'db'.
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/gold_seller_db
-      - SPRING_DATASOURCE_USERNAME=${DB_USER}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/gold_seller
+      - SPRING_DATASOURCE_USERNAME=marquin
+      - SPRING_DATASOURCE_PASSWORD=post1929
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     networks:
       - minha-rede # Conecta este serviço à mesma rede do banco.

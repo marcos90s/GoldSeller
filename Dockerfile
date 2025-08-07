@@ -1,5 +1,11 @@
-FROM eclipse-temurin:17
-LABEL maintainer='marcosvieira90ss@gmail.com'
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /goldseller
-COPY target/goldSellerAPI-0.0.1-SNAPSHOT.jar /goldseller/gold-seller.jar
-ENTRYPOINT ["java","-jar", "gold-seller.jar"]
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn package -DskipTests
+FROM eclipse-temurin:17
+WORKDIR /goldseller
+COPY --from=build /goldseller/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar", "app.jar"]
