@@ -35,8 +35,7 @@ public class UsersController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UsersResponseDTO>> getAllUsers(@RequestParam (name = "email", required = false) String email) {
         List<UsersResponseDTO> users;
-        System.out.println("PARAMETRO RECEBIDO BACKEND: "+email
-        );
+
         if(email != null && !email.trim().isEmpty()){
             System.out.println("GET BY EMAIL");
             users = usersService.getByEmail(email);
